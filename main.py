@@ -10,8 +10,10 @@ pygame.display.set_caption("Tic Tac Toe")
 # Colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
+RED = (255, 0, 0)
 
 MARGIN = 30
+LINE_THICKNESS = 5
 
 # Font
 FONT = pygame.font.SysFont('comicsans', 60)
@@ -50,7 +52,7 @@ def draw_status():
     if winner is None:
         message = "Turn: " + turn.upper()
     else:
-        message = winner.upper() + "won!"
+        message = winner.upper() + " won!"
     if draw:
         message = "Draw!"
 
@@ -119,6 +121,56 @@ def user_click():
     # Draw when mouse is in the correct position
     if row and column and board[row - 1][column - 1] is None:
         draw_xo(row, column)
+        check_win()
+
+
+def check_win():
+    global board, winner, draw
+
+    # Check rows and columns
+    for line in range(0, 3):
+        # Rows
+        if board[line][0] == board[line][1] == board[line][2] is not None:
+            winner = board[line][0]
+            pygame.draw.line(WIN, RED,
+                             (0, (line+1)*HEIGHT / 3 - HEIGHT / 6),
+                             (WIDTH, (line+1)*HEIGHT / 3 - HEIGHT / 6),
+                             LINE_THICKNESS)
+            break
+        # Columns
+        elif board[0][line] == board[1][line] == board[2][line] is not None:
+            winner = board[0][line]
+            pygame.draw.line(WIN, RED,
+                             ((line+1)*WIDTH / 3 - WIDTH / 6, 0),
+                             ((line+1)*WIDTH / 3 - WIDTH / 6, HEIGHT),
+                             LINE_THICKNESS)
+            break
+
+    # Check diagonals
+    if board[0][0] == board[1][1] == board[2][2] is not None:  # From left to right
+        winner = board[0][0]
+        pygame.draw.line(WIN, RED,
+                         (0, 0),
+                         (WIDTH, HEIGHT),
+                         LINE_THICKNESS)
+    elif board[0][2] == board[1][1] == board[2][0] is not None:  # From right to left
+        winner = board[0][2]
+        pygame.draw.line(WIN, RED,
+                         (WIDTH, 0),
+                         (0, HEIGHT),
+                         LINE_THICKNESS)
+
+    # Check if draw
+    if all(all(row) for row in board) and winner is None:
+        draw = True
+        # pygame.draw.line(WIN, RED,
+        #                  (WIDTH / 4, HEIGHT / 4),
+        #                  (WIDTH - WIDTH / 4, HEIGHT - HEIGHT / 4),
+        #                  LINE_THICKNESS)
+        # pygame.draw.line(WIN, RED,
+        #                  (WIDTH - WIDTH / 4, HEIGHT / 4),
+        #                  (WIDTH / 4, HEIGHT - HEIGHT / 4),
+        #                  LINE_THICKNESS)
 
 
 def main():
