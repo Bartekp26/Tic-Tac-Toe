@@ -11,6 +11,8 @@ pygame.display.set_caption("Tic Tac Toe")
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
+MARGIN = 30
+
 # Font
 FONT = pygame.font.SysFont('comicsans', 60)
 
@@ -23,6 +25,8 @@ winner = None
 draw = None
 turn = 'x'
 
+board = [[None]*3, [None]*3, [None]*3]
+
 
 def draw_board():
     WIN.fill(WHITE)
@@ -34,6 +38,8 @@ def draw_board():
     # Drawing horizontal lines
     pygame.draw.line(WIN, BLACK, (0, HEIGHT / 3), (WIDTH, HEIGHT / 3), 8)
     pygame.draw.line(WIN, BLACK, (0, HEIGHT / 3 * 2), (WIDTH, HEIGHT / 3 * 2), 8)
+
+    draw_status()
 
 
 def draw_status():
@@ -51,17 +57,80 @@ def draw_status():
     status_text = FONT.render(message, True, WHITE)
     WIN.blit(status_text, (20, HEIGHT + STATUS_HEIGHT / 2 - status_text.get_height() / 2))
 
+    pygame.display.update()
+
+
+def draw_xo(row, column):
+    global board, turn
+
+    pos_x, pos_y = None, None
+    # Setting position x of image with margin
+    if row == 1:
+        pos_x = MARGIN
+    if row == 2:
+        pos_x = WIDTH / 3 + MARGIN
+    if row == 3:
+        pos_x = WIDTH / 3 * 2 + MARGIN
+
+    # Setting position y of image with margin
+    if column == 1:
+        pos_y = MARGIN
+    if column == 2:
+        pos_y = HEIGHT / 3 + MARGIN
+    if column == 3:
+        pos_y = HEIGHT / 3 * 2 + MARGIN
+
+    board[row-1][column-1] = turn
+
+    if turn == 'x':
+        # Pasting x image
+        WIN.blit(X_IMAGE, (pos_y, pos_x))
+        turn = 'o'
+    elif turn == 'o':
+        # Pasting o image
+        WIN.blit(O_IMAGE, (pos_y, pos_x))
+        turn = 'x'
+    pygame.display.update()
+
+
+def user_click():
+    x, y = pygame.mouse.get_pos()
+
+    # Get column from mouse position
+    if x < WIDTH / 3:
+        column = 1
+    elif x < WIDTH / 3 * 2:
+        column = 2
+    elif x < WIDTH:
+        column = 3
+    else:
+        column = None
+
+    # Get row from mouse position
+    if y < HEIGHT / 3:
+        row = 1
+    elif y < HEIGHT / 3 * 2:
+        row = 2
+    elif y < HEIGHT:
+        row = 3
+    else:
+        row = None
+
+    # Draw when mouse is in the correct position
+    if row and column and board[row - 1][column - 1] is None:
+        draw_xo(row, column)
+
 
 def main():
+    draw_board()
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-
-        draw_board()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                user_click()
         draw_status()
-        pygame.display.update()
 
 
 if __name__ == "__main__":
